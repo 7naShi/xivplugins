@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="" />
+  <meta name="theme-color" content="#232428" id="meta-theme-color" />
+  <title>XIVPlugins — Dalamud plugin index</title>
+  <!-- モジュール読込前に配色を同期（FOUC / 切替が効かない問題の防止）。キーは i18n.js STORAGE_KEY と同一。 -->
+  <script>
+    (function () {
+      try {
+        var raw = localStorage.getItem('xivplugins.directory.settings.v1');
+        var resolved = 'dark';
+        var textScale = 'normal';
+        if (raw) {
+          var o = JSON.parse(raw);
+          var cs = o.colorScheme;
+          if (cs === 'light') resolved = 'light';
+          else if (cs === 'dark') resolved = 'dark';
+          else if (typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: light)').matches) {
+            resolved = 'light';
+          }
+          textScale = o.fontScale === 'large' ? 'large' : 'normal';
+        } else if (typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: light)').matches) {
+          resolved = 'light';
+        }
+        document.documentElement.setAttribute('data-color-scheme', resolved);
+        document.documentElement.setAttribute('data-text-scale', textScale);
+        var mc = document.getElementById('meta-theme-color');
+        if (mc) mc.setAttribute('content', resolved === 'light' ? '#c8ced8' : '#232428');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-row">
+      <div class="header-brand">
+        <h1 id="site-heading">XIVPlugins</h1>
+        <p class="meta muted" id="build-meta" hidden></p>
+      </div>
+      <div class="header-actions">
+        <div class="site-settings-root" id="settings-dropdown-root">
+          <button
+            type="button"
+            class="site-settings-btn"
+            id="settings-trigger"
+            aria-expanded="false"
+            aria-haspopup="dialog"
+            aria-controls="settings-popover"
+          >
+            <span class="site-settings-icon" aria-hidden="true">⚙</span>
+            <span class="visually-hidden" id="settings-trigger-label">Settings</span>
+          </button>
+          <div
+            class="site-settings-popover"
+            id="settings-popover"
+            role="dialog"
+            aria-labelledby="settings-popover-title"
+            hidden
+          >
+            <p class="site-settings-title" id="settings-popover-title">Settings</p>
+            <div class="site-settings-fields">
+              <label class="settings-field" for="setting-locale"><span>Language</span></label>
+              <select id="setting-locale">
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+              </select>
+              <label class="settings-field" for="setting-timezone"><span>Time zone</span></label>
+              <select id="setting-timezone"></select>
+              <label class="settings-field" for="setting-color-scheme"><span>Theme</span></label>
+              <select id="setting-color-scheme">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+              <label class="settings-field" for="setting-plugin-view"><span>View</span></label>
+              <select id="setting-plugin-view">
+                <option value="tile">Card</option>
+                <option value="list">List</option>
+              </select>
+              <label class="settings-field" for="setting-font-scale"><span>Text size</span></label>
+              <select id="setting-font-scale">
+                <option value="default">Default</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <section class="toolbar">
+    <label class="search-label">
+      <span id="label-search" class="field-label">Search</span>
+      <input type="search" id="search" placeholder="" autocomplete="off" />
+    </label>
+    <label class="source-label">
+      <span id="label-feed" class="field-label">Feed</span>
+      <select id="source-filter" title="">
+        <option value="">All</option>
+      </select>
+    </label>
+    <div class="tag-filter-section">
+      <label class="tag-filter-label">
+        <span id="label-tag-filter" class="field-label">Tags</span>
+        <select id="tag-selector">
+          <option value="">Add tag…</option>
+        </select>
+      </label>
+    </div>
+    <div class="sort">
+      <span id="sort-label">Sort</span>
+      <button type="button" id="sort-updated" class="active">Updated</button>
+      <button type="button" id="sort-alpha">Name (A–Z)</button>
+    </div>
+    <p class="count" id="count">Loading…</p>
+    <div class="active-tags" id="active-tags"></div>
+  </section>
+
+  <main>
+    <div class="plugin-grid" id="plugin-grid" aria-busy="true"></div>
+    <p class="error" id="error" hidden></p>
+  </main>
+
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
